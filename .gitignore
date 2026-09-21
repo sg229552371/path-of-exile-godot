@@ -1,0 +1,31 @@
+# Godot 4
+.godot/
+*.import
+.import/
+
+# 导出产物
+/builds/
+export_presets.cfg
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# godot_ai MCP 配置（由 dock Configure 动态写入，含会话令牌）
+.mcp.json
+
+# ziva_agent 插件二进制（1.5GB，超 GitHub 100MB 限制；用到的机器重装插件即可）
+addons/ziva_agent/
+
+# Claude 本地私有权限（含个人 token 授权，勿上传）
+.claude/settings.local.json
+
+# 开发期临时文件
+_tmp_*
+_o.txt

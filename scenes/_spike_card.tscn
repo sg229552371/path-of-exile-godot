@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://3a35yb6bh417"]
+
+[ext_resource type="Texture2D" uid="uid://dqcktohfddgxl" path="res://assets/_spike/card_panel.png" id="1_54r84"]
+[ext_resource type="Texture2D" uid="uid://cyi6sjttf4xn0" path="res://assets/_spike/icon_shield_trans.png" id="2_shield"]
+[ext_resource type="Texture2D" uid="uid://brty8xyy02t6p" path="res://assets/_spike/card_base.png" id="3_ref"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_opau8"]
+content_margin_left = 76.0
+content_margin_top = 76.0
+content_margin_right = 76.0
+content_margin_bottom = 76.0
+texture = ExtResource("1_54r84")
+texture_margin_left = 60.0
+texture_margin_top = 60.0
+texture_margin_right = 60.0
+texture_margin_bottom = 60.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_price"]
+bg_color = Color(0.937255, 0.858824, 0.666667, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.290196, 0.215686, 0.156863, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 12.0
+content_margin_right = 12.0
+
+[node name="SpikeCard" type="Control" unique_id=417755136]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1294087555]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+
+[node name="CardPanel" type="PanelContainer" parent="HBoxContainer" unique_id=190305442]
+custom_minimum_size = Vector2(280, 420)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_opau8")
+
+[node name="Content" type="VBoxContainer" parent="HBoxContainer/CardPanel" unique_id=1648416370]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="IconShield" type="TextureRect" parent="HBoxContainer/CardPanel/Content" unique_id=2092973040]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 4
+texture = ExtResource("2_shield")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="HBoxContainer/CardPanel/Content" unique_id=1885025468]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.176471, 0.12549, 0.0862745, 1)
+theme_override_font_sizes/font_size = 32
+text = "能量护盾"
+horizontal_alignment = 1
+
+[node name="Stat1" type="Label" parent="HBoxContainer/CardPanel/Content" unique_id=1512549074]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.215686, 0.156863, 1)
+theme_override_font_sizes/font_size = 24
+text = "护甲  +5"
+
+[node name="Stat2" type="Label" parent="HBoxContainer/CardPanel/Content" unique_id=1920877254]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.290196, 0.215686, 0.156863, 1)
+theme_override_font_sizes/font_size = 24
+text = "暴击率  +6%"
+
+[node name="Spacer" type="Control" parent="HBoxContainer/CardPanel/Content" unique_id=1282332121]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="PriceRow" type="PanelContainer" parent="HBoxContainer/CardPanel/Content" unique_id=1140671144]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_price")
+
+[node name="PriceLabel" type="Label" parent="HBoxContainer/CardPanel/Content/PriceRow" unique_id=168886499]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "128"
+horizontal_alignment = 1
+
+[node name="RefImg" type="TextureRect" parent="HBoxContainer" unique_id=1958284931]
+custom_minimum_size = Vector2(320, 480)
+layout_mode = 2
+texture = ExtResource("3_ref")
+expand_mode = 1
+stretch_mode = 5
