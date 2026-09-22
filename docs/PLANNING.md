@@ -136,6 +136,89 @@ D2 验证了"一张卡片"的最小闭环；本次升级为**整屏 UI 演练**�
 
 ---
 
+## D5 — 全 UI 界面批量制作波次：14 屏静态壳（2026-09-22）
+
+### 目标
+
+以 `任务列表/任务目标/_NN_*.png`（14 张 1920×1080 Brotato 卡通风设计稿）为视觉规范，批量制作全部 UI 界面。**完成标准（用户拍板）：静态壳 + 假数据**——每屏可运行场景，数据驱动填假数据，游戏内截图对齐设计稿；不接真实功能、不接屏间跳转。并行机制=单会话子代理；验收=截图 + 逐块清点 + 审图，3 轮上限。
+
+### 用户拍板的资产产线（本段核心约束）
+
+1. **图标走 4×4 网格 sheet 标准产线**：提示词 `"a 4×4 grid sheet of 16 fantasy RPG item icons, all in identical style: ..."`，生成后脚本切网格得 16 张风格统一小图。独立游戏 AI 产图标的标准做法。
+2. **图标分 4–5 张 sheet 分批生成**：按类分组（武器类 / 防具类 / 消耗品类 / 材料货币类 / UI 符号类…），单次失败不拖垮全批。
+3. **按钮和 UI 框（九宫格底板）也走同一生图管线**，与图标同一风格锚——**风格统一是本波次第一验收项**。
+4. **严格两阶段顺序**：先草图快速迭代阶段（`nano-banana-2-lite`，~8s/张）→ 全部草图确认后，才进入 UI 设计稿 / 高保真参考图阶段（`og-image-2` + `quality:"hd"`）。同模板同尺寸，两阶段只换模型不改模板。
+
+### 屏幕清单与分组（14 屏，编号对齐任务列表）
+
+| 组 | 屏幕 | 布局家族 | 子代理 |
+| :-- | :-- | :-- | :-- |
+| A | 01 主菜单 / 04 难度选择 / 10 设置 / 14 MOD | 全屏菜单族（大按钮+背景） | A |
+| B | 02 角色选择 / 03 武器选择 / 07 升级选择 | 卡片选择族（卡格+图标） | B |
+| C | 06 暂停菜单 / 08 宝箱 / 13 游戏结束 | 弹窗覆盖族（面板+遮罩） | C |
+| D | 05 战斗HUD / 11 进度成就 / 12 图鉴 | 数据密集族（多栏+列表） | D |
+| — | 09 商店 | （D4 Spike 已实现，直接转正，不重做） | 主会话 |
+
+另加开发工具：`scenes/ui/ui_gallery.tscn` 屏幕浏览器（按钮列表跳 14 屏，供逐屏查看；纯开发工具，不算屏间跳转）。
+
+### 分步执行清单
+
+**阶段 0：契约冻结 + 资产集中生产（主会话串行）**
+
+0.1 本段文档 → verify: 本段存在
+0.2 `theme/main_theme.tres`：从 `spike_shop_theme.tres` 迁移 + 补齐预判变体；注册为项目默认主题（唯一一次改 `project.godot`，此后子代理禁碰）→ verify: 无头自检通过
+0.3 草图阶段批量生图（全部走 lite）：
+  - 13 张纯景背景（无 UI 无角色，D4 修正项#9）
+  - 4–5 张 4×4 图标 sheet（按类分批）→ `tools/slice_grid.py` 切网格 → verify: 每张 sheet 肉眼核图（D4 修正项#8）后切片落盘
+  - 按钮/UI 框九宫格底板（同风格锚）→ verify: 落 `theme/` 配套资产
+  - 主菜单 Logo 定妆照（img2img 三板斧路线，预期多 1–2 轮）
+0.4 草图全批确认（用户过目或按锚图自检）→ **进入高保真阶段：同模板同尺寸切 og-image-2+hd 重生成全部定稿资产** → verify: 落盘 `assets/ui/<屏名>/`
+0.5 商店转正：`_spike_shop.tscn` → `scenes/ui/09_shop.tscn`，资产搬 `assets/ui/shop/` → verify: 运行无报错
+0.6 所有权地图登记（§4 追加）→ verify: 表已更新
+
+**阶段 1：4 个子代理并行组装（13 屏）**
+
+每个子代理产物（所有权独占，互不交叉）：
+- `scenes/ui/NN_xxx.tscn` + `scripts/ui/NN_xxx_builder.gd`（数据驱动，D4 修正项#7）
+- `theme/<家族>_theme.tres`（家族专属变体，只挂自己场景根；公共部分只读 main_theme）
+- `test/unit/test_ui_<家族>.gd`（冒烟：场景可实例化、卡片数=数据数）
+- 自带 D4 全部 12 条修正项 + 逐块清点控件清单验收
+- 循环：实现 → 单测 → 截图 → 审图 → 修复；3 轮上限，超限带问题上报（§10.3 护栏）
+
+**阶段 2：收尾（主会话）**
+
+2.1 全量 GUT + Scripts 计数核对（H6）+ 无头自检 → verify: 全绿且计数相符
+2.2 ui_gallery 逐屏截图汇总交用户过目 → 用户反馈单列修复清单
+2.3 PLANNING 闭环回写本段
+
+### 文件所有权登记（§4 地图本波次追加）
+
+| 文件/目录 | owner |
+| :-- | :-- |
+| `docs/PLANNING.md`、`project.godot`、`theme/main_theme.tres`、`assets/ui/`（阶段0）、`scenes/ui/ui_gallery.tscn` | 主会话 |
+| 组 A：`scenes/ui/01_*.tscn` `04_*` `10_*` `14_*` + `scripts/ui/` 对应 builder + `theme/menu_family_theme.tres` + `test/unit/test_ui_menu.gd` | 子代理 A |
+| 组 B：`scenes/ui/02_*` `03_*` `07_*` + 同上 + `theme/card_family_theme.tres` + `test/unit/test_ui_card.gd` | 子代理 B |
+| 组 C：`scenes/ui/06_*` `08_*` `13_*` + 同上 + `theme/popup_family_theme.tres` + `test/unit/test_ui_popup.gd` | 子代理 C |
+| 组 D：`scenes/ui/05_*` `11_*` `12_*` + 同上 + `theme/data_family_theme.tres` + `test/unit/test_ui_data.gd` | 子代理 D |
+| `09_shop.tscn`（转正期间） | 主会话 |
+
+命名规范：场景/资产带两位编号前缀（`01_main_menu`），与任务列表图号一一对应。
+
+### 已知风险
+
+- 主菜单 Logo 艺术字生图不可靠 → 定妆照 img2img + 字体兜底，预算 1–2 轮。
+- 资产量大（~23+ 张生成图）→ 分 sheet 分批（本段约束#2）控单次失败影响面；阶段 0 是串行瓶颈。
+- og-image-2 慢（~112s/张）→ 仅定稿阶段使用，lite 阶段先全部收敛构图。
+
+### 影响面 / 回滚
+
+- 新建：`theme/main_theme.tres` 及 4 个家族 theme、`assets/ui/`、`scenes/ui/`（15 场景含 gallery）、`scripts/ui/`、`test/unit/test_ui_*.gd`（4 份）、`tools/slice_grid.py`
+- 修改：`project.godot`（默认主题 + main_scene 切至 gallery/ui）、商店 Spike 文件迁移（原 `_spike_` 产物保留至收尾后清理）
+- 不动：core/combat 模块、EventKeys 契约、既有 6 份单测
+- 回滚：删除上述新建文件；`project.godot` 还原默认主题与 main_scene 两键；Spike 文件原样在盘，零数据损失
+
+---
+
 ## D1 — 从 D:\AI-game（《流放者》/AI-GameW）移植 AI 开发基础设施（2026-09-21）
 
 ### 背景
